@@ -46,7 +46,6 @@ csc227/
 ├── RoundRobinScheduler.java     # Round-Robin algorithm implementation
 ├── PriorityScheduler.java       # Priority scheduling with aging
 ├── job.txt                      # Input file with process information
-├── PROJECT_REPORT.md            # Detailed project report
 └── README.md                    # This file
 ```
 
