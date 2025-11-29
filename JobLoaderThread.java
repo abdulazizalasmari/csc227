@@ -18,9 +18,6 @@ public class JobLoaderThread extends Thread {
     
     @Override
     public void run() {
-        SystemCalls.logInfo("\n=== Job Loader Thread Started ===");
-        SystemCalls.logInfo("Monitoring job queue and memory availability...\n");
-        
         try {
             while (running) {
                 // Check if there are jobs in the job queue
@@ -39,10 +36,6 @@ public class JobLoaderThread extends Thread {
                             
                             // Add to ready queue
                             readyQueue.enqueue(process);
-                            
-                            SystemCalls.logInfo(String.format("Loaded P%d to Ready Queue (DoM: %d, Available Memory: %d MB)",
-                                process.getProcessId(), process.getDegreeOfMultiprogramming(), 
-                                memoryManager.getAvailableMemory()));
                         }
                     } else {
                         // Not enough memory, wait for some to be freed
@@ -62,10 +55,6 @@ public class JobLoaderThread extends Thread {
                 // Small delay to prevent busy waiting
                 Thread.sleep(10);
             }
-            
-            SystemCalls.logInfo("\n=== Job Loader Thread Completed ===");
-            SystemCalls.logInfo(String.format("All jobs loaded to ready queue. Ready queue size: %d\n", 
-                readyQueue.size()));
             
         } catch (InterruptedException e) {
             SystemCalls.logInfo("Job loader thread interrupted");

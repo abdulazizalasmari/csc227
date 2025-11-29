@@ -130,10 +130,6 @@ public class CPUSchedulerSimulator {
             fileReader.join();
             jobLoader.join();
             
-            System.out.println("\n" + "=".repeat(70));
-            System.out.println("SYSTEM READY - Starting Scheduler");
-            System.out.println("=".repeat(70));
-            
             // Initialize and run scheduler
             scheduler.initialize(readyQueue, memoryManager);
             scheduler.schedule();

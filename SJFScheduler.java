@@ -6,9 +6,11 @@ import java.util.List;
  * Selects the process with the shortest burst time first
  */
 public class SJFScheduler extends Scheduler {
+    private List<String> starvationLog;
     
     public SJFScheduler() {
         super("Shortest Job First (SJF) - Non-Preemptive");
+        this.starvationLog = new ArrayList<>();
     }
     
     @Override
@@ -45,10 +47,6 @@ public class SJFScheduler extends Scheduler {
             int startTime = currentTime;
             shortestJob.setStartTime(startTime);
             
-            SystemCalls.logInfo(String.format("[Time %d] Executing P%d (Burst: %d ms, Priority: %d)",
-                currentTime, shortestJob.getProcessId(), shortestJob.getBurstTime(), 
-                shortestJob.getPriority()));
-            
             // Execute entire burst (non-preemptive)
             currentTime += shortestJob.getBurstTime();
             
@@ -67,13 +65,7 @@ public class SJFScheduler extends Scheduler {
             
             // Add to completed list
             completedProcesses.add(shortestJob);
-            
-            SystemCalls.logInfo(String.format("[Time %d] P%d completed (WT: %d ms, TAT: %d ms)\n",
-                currentTime, shortestJob.getProcessId(), 
-                shortestJob.getWaitingTime(), shortestJob.getTurnaroundTime()));
         }
-        
-        SystemCalls.logInfo(String.format("SJF Scheduling completed at time %d ms\n", currentTime));
     }
     
     /**
@@ -111,8 +103,26 @@ public class SJFScheduler extends Scheduler {
             
             if (threshold > 0 && waitTime > threshold && !process.isStarved()) {
                 process.setStarved(true);
-                SystemCalls.logStarvation(process.getProcessId(), waitTime, threshold);
+                // Log starvation event
+                String logEntry = String.format("Process P%d starved at time=%dms (Waited: %dms, DOP: %d). No aging in SJF.",
+                    process.getProcessId(), currentTime, waitTime, threshold);
+                starvationLog.add(logEntry);
             }
+        }
+    }
+    
+    @Override
+    public void displayStatistics() {
+        // Call parent display first
+        super.displayStatistics();
+        
+        // Then display starvation log if any
+        if (!starvationLog.isEmpty()) {
+            System.out.println("\n--- Starvation Detection Log ---");
+            for (String log : starvationLog) {
+                System.out.println(log);
+            }
+            System.out.println("=".repeat(70) + "\n");
         }
     }
 }

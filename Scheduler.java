@@ -63,12 +63,6 @@ public abstract class Scheduler {
             
             totalWaitingTime += process.getWaitingTime();
             totalTurnaroundTime += process.getTurnaroundTime();
-            
-            // Check for starvation
-            if (process.isStarved()) {
-                SystemCalls.logInfo(String.format("  ** P%d experienced STARVATION **", 
-                    process.getProcessId()));
-            }
         }
         
         SystemCalls.logInfo("-".repeat(70));

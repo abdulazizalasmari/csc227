@@ -7,9 +7,11 @@ import java.util.List;
  * Implements aging when a process waits more than the degree of multiprogramming
  */
 public class PriorityScheduler extends Scheduler {
+    private List<String> starvationLog;
     
     public PriorityScheduler() {
         super("Priority Scheduling (1=Lowest, 128=Highest) with Aging");
+        this.starvationLog = new ArrayList<>();
     }
     
     @Override
@@ -49,12 +51,6 @@ public class PriorityScheduler extends Scheduler {
             int startTime = currentTime;
             highestPriority.setStartTime(startTime);
             
-            SystemCalls.logInfo(String.format("[Time %d] Executing P%d (Burst: %d ms, Priority: %d%s)",
-                currentTime, highestPriority.getProcessId(), 
-                highestPriority.getBurstTime(), highestPriority.getPriority(),
-                highestPriority.getPriority() != highestPriority.getOriginalPriority() 
-                    ? " [Aged from " + highestPriority.getOriginalPriority() + "]" : ""));
-            
             // Execute entire burst (non-preemptive)
             currentTime += highestPriority.getBurstTime();
             
@@ -70,13 +66,22 @@ public class PriorityScheduler extends Scheduler {
             
             // Add to completed list
             completedProcesses.add(highestPriority);
-            
-            SystemCalls.logInfo(String.format("[Time %d] P%d completed (WT: %d ms, TAT: %d ms)\n",
-                currentTime, highestPriority.getProcessId(), 
-                highestPriority.getWaitingTime(), highestPriority.getTurnaroundTime()));
         }
+    }
+    
+    @Override
+    public void displayStatistics() {
+        // Call parent display first
+        super.displayStatistics();
         
-        SystemCalls.logInfo(String.format("Priority Scheduling completed at time %d ms\n", currentTime));
+        // Then display starvation log if any
+        if (!starvationLog.isEmpty()) {
+            System.out.println("\n--- Starvation and Aging Log ---");
+            for (String log : starvationLog) {
+                System.out.println(log);
+            }
+            System.out.println("=".repeat(70) + "\n");
+        }
     }
     
     /**
@@ -116,7 +121,6 @@ public class PriorityScheduler extends Scheduler {
             if (threshold > 0 && waitTime > threshold) {
                 if (!process.isStarved()) {
                     process.setStarved(true);
-                    SystemCalls.logStarvation(process.getProcessId(), waitTime, threshold);
                 }
                 
                 // Apply aging: increase priority
@@ -124,7 +128,10 @@ public class PriorityScheduler extends Scheduler {
                 process.applyAging();
                 
                 if (process.getPriority() != oldPriority) {
-                    SystemCalls.logAging(process.getProcessId(), oldPriority, process.getPriority());
+                    // Log starvation and aging event
+                    String logEntry = String.format("Process P%d starved at time=%dms (Waited: %dms, DOP: %d). Priority Aged to: %d.",
+                        process.getProcessId(), currentTime, waitTime, threshold, process.getPriority());
+                    starvationLog.add(logEntry);
                 }
             }
         }

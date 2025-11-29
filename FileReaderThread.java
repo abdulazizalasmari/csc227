@@ -20,9 +20,6 @@ public class FileReaderThread extends Thread {
     
     @Override
     public void run() {
-        SystemCalls.logInfo("\n=== File Reader Thread Started ===");
-        SystemCalls.logInfo("Reading processes from: " + filename);
-        
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             String line;
             
@@ -42,10 +39,6 @@ public class FileReaderThread extends Thread {
                         
                         jobQueue.enqueue(process);
                         processCount++;
-                        
-                        SystemCalls.logInfo(String.format("  Loaded: P%d [Burst=%dms, Priority=%d, Memory=%dMB]",
-                            process.getProcessId(), process.getBurstTime(), 
-                            process.getPriority(), process.getMemoryRequired()));
                     }
                 } catch (Exception e) {
                     SystemCalls.logInfo("  Error parsing line: " + line);
@@ -53,9 +46,7 @@ public class FileReaderThread extends Thread {
                 }
             }
             
-            SystemCalls.logInfo(String.format("\nFile reading complete. Total processes loaded: %d", processCount));
             jobQueue.markReadingComplete();
-            SystemCalls.logInfo("=== File Reader Thread Completed ===\n");
             
         } catch (IOException e) {
             SystemCalls.logInfo("Error reading file: " + e.getMessage());

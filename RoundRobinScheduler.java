@@ -44,10 +44,6 @@ public class RoundRobinScheduler extends Scheduler {
             int startTime = currentTime;
             int executionTime = Math.min(TIME_QUANTUM, process.getRemainingTime());
             
-            SystemCalls.logInfo(String.format("[Time %d] Executing P%d (Remaining: %d ms -> %d ms)",
-                currentTime, process.getProcessId(), process.getRemainingTime(),
-                process.getRemainingTime() - executionTime));
-            
             // Execute for quantum or remaining time
             process.execute(executionTime);
             currentTime += executionTime;
@@ -65,20 +61,11 @@ public class RoundRobinScheduler extends Scheduler {
                 
                 // Add to completed list
                 completedProcesses.add(process);
-                
-                SystemCalls.logInfo(String.format("[Time %d] P%d completed (WT: %d ms, TAT: %d ms)\n",
-                    currentTime, process.getProcessId(), 
-                    process.getWaitingTime(), process.getTurnaroundTime()));
             } else {
                 // Process not completed, add back to queue
                 process.setState(ProcessState.READY);
                 rrQueue.offer(process);
-                
-                SystemCalls.logInfo(String.format("[Time %d] P%d preempted, added back to queue\n",
-                    currentTime, process.getProcessId()));
             }
         }
-        
-        SystemCalls.logInfo(String.format("Round-Robin Scheduling completed at time %d ms\n", currentTime));
     }
 }

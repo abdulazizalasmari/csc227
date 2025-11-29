@@ -1,14 +1,9 @@
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 /**
  * SystemCalls - Simulates operating system calls for process control,
  * information maintenance, and memory management
  */
 public class SystemCalls {
     private static boolean verboseLogging = true;
-    private static final DateTimeFormatter timeFormatter = 
-        DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
     
     // ==================== Process Control System Calls ====================
     
@@ -226,8 +221,7 @@ public class SystemCalls {
      */
     private static void log(String message) {
         if (verboseLogging) {
-            String timestamp = LocalDateTime.now().format(timeFormatter);
-            System.out.println("[" + timestamp + "] " + message);
+            System.out.println(message);
         }
     }
     
