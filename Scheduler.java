@@ -85,24 +85,72 @@ public abstract class Scheduler {
         SystemCalls.logInfo("\nGANTT CHART:");
         SystemCalls.logInfo("-".repeat(70));
         
-        StringBuilder processes = new StringBuilder("|");
-        StringBuilder times = new StringBuilder("0");
+        // Calculate box width for each process based on execution time
+        List<Integer> boxWidths = new ArrayList<>();
         
         for (GanttEntry entry : ganttChart) {
-            String processLabel = String.format(" P%d ", entry.processId);
-            int width = Math.max(6, processLabel.length());
-            
-            // Add process to chart
-            processes.append(String.format("%-" + width + "s|", processLabel));
-            
-            // Add end time
-            String timeStr = String.valueOf(entry.endTime);
-            int padding = width - timeStr.length();
-            times.append(" ".repeat(Math.max(0, padding + 1))).append(timeStr);
+            int duration = entry.endTime - entry.startTime;
+            // Make box width proportional to duration, minimum 8 characters
+            int width = Math.max(8, duration);
+            boxWidths.add(width);
         }
         
-        SystemCalls.logInfo(processes.toString());
-        SystemCalls.logInfo(times.toString());
+        // Build top border
+        StringBuilder topBorder = new StringBuilder("__");
+        for (int width : boxWidths) {
+            topBorder.append("_".repeat(width));
+        }
+        
+        // Build top line of boxes
+        StringBuilder topLine = new StringBuilder("|");
+        for (int width : boxWidths) {
+            topLine.append(" ".repeat(width)).append("|");
+        }
+        
+        // Build middle line with process names
+        StringBuilder middleLine = new StringBuilder("|");
+        for (int i = 0; i < ganttChart.size(); i++) {
+            GanttEntry entry = ganttChart.get(i);
+            String processLabel = String.format("P%d", entry.processId);
+            int width = boxWidths.get(i);
+            int padding = width - processLabel.length();
+            int leftPad = padding / 2;
+            int rightPad = padding - leftPad;
+            middleLine.append(" ".repeat(leftPad))
+                      .append(processLabel)
+                      .append(" ".repeat(rightPad))
+                      .append("|");
+        }
+        
+        // Build bottom line of boxes
+        StringBuilder bottomLine = new StringBuilder("|");
+        for (int width : boxWidths) {
+            bottomLine.append(" ".repeat(width)).append("|");
+        }
+        
+        // Build bottom border
+        StringBuilder bottomBorder = new StringBuilder("__");
+        for (int width : boxWidths) {
+            bottomBorder.append("_".repeat(width));
+        }
+        
+        // Build timeline
+        StringBuilder timeline = new StringBuilder(String.valueOf(ganttChart.get(0).startTime));
+        for (int i = 0; i < ganttChart.size(); i++) {
+            GanttEntry entry = ganttChart.get(i);
+            int width = boxWidths.get(i);
+            String endTimeStr = String.valueOf(entry.endTime);
+            int padding = width - endTimeStr.length() + 1;
+            timeline.append(" ".repeat(padding)).append(endTimeStr);
+        }
+        
+        // Print the Gantt chart
+        SystemCalls.logInfo(topBorder.toString());
+        SystemCalls.logInfo(topLine.toString());
+        SystemCalls.logInfo(middleLine.toString());
+        SystemCalls.logInfo(bottomLine.toString());
+        SystemCalls.logInfo(bottomBorder.toString());
+        SystemCalls.logInfo(timeline.toString());
         
         // Display detailed execution timeline
         SystemCalls.logInfo("\nEXECUTION TIMELINE:");

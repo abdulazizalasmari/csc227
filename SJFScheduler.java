@@ -15,9 +15,9 @@ public class SJFScheduler extends Scheduler {
     
     @Override
     public void schedule() {
-        SystemCalls.logInfo("\n" + "=".repeat(70));
-        SystemCalls.logInfo("Starting SJF Scheduling...");
-        SystemCalls.logInfo("=".repeat(70));
+        System.out.println("\n" + "=".repeat(70));
+        System.out.println("STATE CHANGES");
+        System.out.println("=".repeat(70));
         
         int currentTime = 0;
         List<PCB> allProcesses = new ArrayList<>();
@@ -41,17 +41,25 @@ public class SJFScheduler extends Scheduler {
             // Remove from list
             allProcesses.remove(shortestJob);
             
+            int startTime = currentTime;
+            shortestJob.setStartTime(startTime);
+            shortestJob.setState(ProcessState.RUNNING);
+            
+            System.out.println(String.format("\nProcess %d", shortestJob.getProcessId()));
+            System.out.println("-".repeat(70));
+            
             // Execute the process
             SystemCalls.exec(shortestJob);
             
-            int startTime = currentTime;
-            shortestJob.setStartTime(startTime);
+            System.out.println(String.format("Running at time %d", startTime));
             
             // Execute entire burst (non-preemptive)
             currentTime += shortestJob.getBurstTime();
             
             // Mark as completed
             shortestJob.setCompletionTime(currentTime);
+            shortestJob.setState(ProcessState.TERMINATED);
+            System.out.println(String.format("Terminated at time %d", currentTime));
             SystemCalls.exit(shortestJob, 0);
             
             // Add to Gantt chart

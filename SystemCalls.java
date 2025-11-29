@@ -24,7 +24,7 @@ public class SystemCalls {
      * @return 0 on success, -1 on failure
      */
     public static int exec(PCB process) {
-        log(String.format("SYSCALL: exec() - Executing process P%d [Burst=%dms, Priority=%d]",
+        log(String.format("Executing process P%d [Burst=%dms, Priority=%d]",
             process.getProcessId(), process.getBurstTime(), process.getPriority()));
         process.setState(ProcessState.RUNNING);
         return 0;
@@ -36,8 +36,7 @@ public class SystemCalls {
      * @param exitCode Exit code
      */
     public static void exit(PCB process, int exitCode) {
-        log(String.format("SYSCALL: exit(%d) - Process P%d terminated",
-            exitCode, process.getProcessId()));
+        // Exit syscall without logging
         process.setState(ProcessState.TERMINATED);
     }
     
@@ -162,7 +161,7 @@ public class SystemCalls {
      * Log memory allocation
      */
     public static void logMemoryAllocation(int processId, int size, int remaining) {
-        log(String.format("MEMORY: Allocated %d MB to P%d (Available: %d MB)",
+        log(String.format("Allocated %d MB to P%d (Available: %d MB)",
             size, processId, remaining));
     }
     
@@ -170,7 +169,7 @@ public class SystemCalls {
      * Log memory deallocation
      */
     public static void logMemoryDeallocation(int processId, int size, int remaining) {
-        log(String.format("MEMORY: Deallocated %d MB from P%d (Available: %d MB)",
+        log(String.format("Deallocated %d MB from P%d (Available: %d MB)",
             size, processId, remaining));
     }
     

@@ -14,9 +14,9 @@ public class RoundRobinScheduler extends Scheduler {
     
     @Override
     public void schedule() {
-        SystemCalls.logInfo("\n" + "=".repeat(70));
-        SystemCalls.logInfo("Starting Round-Robin Scheduling (Quantum = 6ms)...");
-        SystemCalls.logInfo("=".repeat(70));
+        System.out.println("\n" + "=".repeat(70));
+        System.out.println("STATE CHANGES");
+        System.out.println("=".repeat(70));
         
         int currentTime = 0;
         Queue<PCB> rrQueue = new LinkedList<>();
@@ -38,10 +38,21 @@ public class RoundRobinScheduler extends Scheduler {
                 process.setStartTime(currentTime);
             }
             
+            process.setState(ProcessState.RUNNING);
+            
+            int startTime = currentTime;
+            
+            // Print process section header only on first execution
+            if (!process.hasStarted() || process.getStartTime() == startTime) {
+                System.out.println(String.format("\nProcess %d", process.getProcessId()));
+                System.out.println("-".repeat(70));
+            }
+            
             // Execute the process
             SystemCalls.exec(process);
             
-            int startTime = currentTime;
+            System.out.println(String.format("Running at time %d", startTime));
+            
             int executionTime = Math.min(TIME_QUANTUM, process.getRemainingTime());
             
             // Execute for quantum or remaining time
@@ -54,6 +65,8 @@ public class RoundRobinScheduler extends Scheduler {
             // Check if process is completed
             if (process.isCompleted()) {
                 process.setCompletionTime(currentTime);
+                process.setState(ProcessState.TERMINATED);
+                System.out.println(String.format("Terminated at time %d", currentTime));
                 SystemCalls.exit(process, 0);
                 
                 // Free memory
@@ -64,6 +77,7 @@ public class RoundRobinScheduler extends Scheduler {
             } else {
                 // Process not completed, add back to queue
                 process.setState(ProcessState.READY);
+                System.out.println(String.format("Ready at time %d", currentTime));
                 rrQueue.offer(process);
             }
         }

@@ -16,9 +16,9 @@ public class PriorityScheduler extends Scheduler {
     
     @Override
     public void schedule() {
-        SystemCalls.logInfo("\n" + "=".repeat(70));
-        SystemCalls.logInfo("Starting Priority Scheduling with Aging...");
-        SystemCalls.logInfo("=".repeat(70));
+        System.out.println("\n" + "=".repeat(70));
+        System.out.println("STATE CHANGES");
+        System.out.println("=".repeat(70));
         
         int currentTime = 0;
         List<PCB> waitingProcesses = new ArrayList<>();
@@ -45,17 +45,25 @@ public class PriorityScheduler extends Scheduler {
             // Remove from waiting list
             waitingProcesses.remove(highestPriority);
             
+            int startTime = currentTime;
+            highestPriority.setStartTime(startTime);
+            highestPriority.setState(ProcessState.RUNNING);
+            
+            System.out.println(String.format("\nProcess %d", highestPriority.getProcessId()));
+            System.out.println("-".repeat(70));
+            
             // Execute the process
             SystemCalls.exec(highestPriority);
             
-            int startTime = currentTime;
-            highestPriority.setStartTime(startTime);
+            System.out.println(String.format("Running at time %d", startTime));
             
             // Execute entire burst (non-preemptive)
             currentTime += highestPriority.getBurstTime();
             
             // Mark as completed
             highestPriority.setCompletionTime(currentTime);
+            highestPriority.setState(ProcessState.TERMINATED);
+            System.out.println(String.format("Terminated at time %d", currentTime));
             SystemCalls.exit(highestPriority, 0);
             
             // Add to Gantt chart
