@@ -303,11 +303,6 @@ Yaqoub Alnajrani 443100407
 
 - **Course**: CSC227
 - **Project**: CPU Scheduler Simulation
-- **Type**: Group Project (up to 3 students)
-
-## License
-
-This is an academic project for educational purposes.
 
 ## Acknowledgments
 
