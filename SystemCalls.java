@@ -235,6 +235,8 @@ public class SystemCalls {
      * Log a message without timestamp
      */
     public static void logInfo(String message) {
-        System.out.println(message);
+        if (verboseLogging) {
+            System.out.println(message);
+        }
     }
 }

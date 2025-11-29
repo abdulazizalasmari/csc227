@@ -15,8 +15,8 @@ public class CPUSchedulerSimulator {
         // Display welcome message
         displayWelcome();
         
-        // Get job file name
-        String jobFile = getJobFileName(scanner);
+        // Use default job file
+        String jobFile = DEFAULT_JOB_FILE;
         
         // Verify file exists
         if (!new File(jobFile).exists()) {
@@ -44,12 +44,9 @@ public class CPUSchedulerSimulator {
                         runScheduler(jobFile, new PriorityScheduler());
                         break;
                     case 4:
-                        runAllSchedulers(jobFile);
-                        break;
-                    case 5:
                         compareSchedulers(jobFile);
                         break;
-                    case 6:
+                    case 5:
                         running = false;
                         System.out.println("\nThank you for using CPU Scheduler Simulator!");
                         break;
@@ -57,7 +54,7 @@ public class CPUSchedulerSimulator {
                         System.out.println("\nInvalid choice. Please try again.");
                 }
                 
-                if (running && choice >= 1 && choice <= 5) {
+                if (running && choice >= 1 && choice <= 4) {
                     System.out.print("\nPress Enter to continue...");
                     scanner.nextLine();
                 }
@@ -79,30 +76,6 @@ public class CPUSchedulerSimulator {
         System.out.println("          CPU SCHEDULER SIMULATOR");
         System.out.println("          Multi-threaded Process Scheduling Simulation");
         System.out.println("=".repeat(70));
-        System.out.println("\nThis simulator demonstrates three CPU scheduling algorithms:");
-        System.out.println("  1. Shortest Job First (SJF) - Non-Preemptive");
-        System.out.println("  2. Round-Robin (RR) - Quantum = 6ms");
-        System.out.println("  3. Priority Scheduling (1=Lowest, 128=Highest) with Aging");
-        System.out.println("\nSystem Specifications:");
-        System.out.println("  - Total Memory: 2048 MB");
-        System.out.println("  - Context Switch Time: 0 ms");
-        System.out.println("  - All processes arrive at time 0");
-        System.out.println("  - Multi-threaded: File Reader + Job Loader");
-    }
-    
-    /**
-     * Get job file name from user
-     */
-    private static String getJobFileName(Scanner scanner) {
-        System.out.print("\nEnter job file name (default: " + DEFAULT_JOB_FILE + "): ");
-        String fileName = scanner.nextLine().trim();
-        
-        if (fileName.isEmpty()) {
-            fileName = DEFAULT_JOB_FILE;
-        }
-        
-        System.out.println("Using job file: " + fileName);
-        return fileName;
     }
     
     /**
@@ -115,10 +88,9 @@ public class CPUSchedulerSimulator {
         System.out.println("1. Run SJF (Shortest Job First) Scheduling");
         System.out.println("2. Run Round-Robin Scheduling");
         System.out.println("3. Run Priority Scheduling with Aging");
-        System.out.println("4. Run All Algorithms");
-        System.out.println("5. Compare All Algorithms");
-        System.out.println("6. Exit");
-        System.out.print("\nEnter your choice (1-6): ");
+        System.out.println("4. Compare All Algorithms");
+        System.out.println("5. Exit");
+        System.out.print("\nEnter your choice (1-5): ");
     }
     
     /**
@@ -176,23 +148,6 @@ public class CPUSchedulerSimulator {
     }
     
     /**
-     * Run all schedulers sequentially
-     */
-    private static void runAllSchedulers(String jobFile) {
-        Scheduler[] schedulers = {
-            new SJFScheduler(),
-            new RoundRobinScheduler(),
-            new PriorityScheduler()
-        };
-        
-        for (Scheduler scheduler : schedulers) {
-            runScheduler(jobFile, scheduler);
-            System.out.println("\n" + "=".repeat(70));
-            System.out.println();
-        }
-    }
-    
-    /**
      * Compare all schedulers
      */
     private static void compareSchedulers(String jobFile) {
@@ -201,10 +156,6 @@ public class CPUSchedulerSimulator {
             new RoundRobinScheduler(),
             new PriorityScheduler()
         };
-        
-        System.out.println("\n" + "=".repeat(70));
-        System.out.println("RUNNING ALL SCHEDULERS FOR COMPARISON");
-        System.out.println("=".repeat(70));
         
         // Disable verbose logging for cleaner comparison
         SystemCalls.setVerboseLogging(false);
@@ -248,40 +199,20 @@ public class CPUSchedulerSimulator {
      * Display comparison of all schedulers
      */
     private static void displayComparison(Scheduler[] schedulers) {
-        System.out.println("\n" + "=".repeat(70));
+        System.out.println("\n" + "=".repeat(90));
         System.out.println("SCHEDULER COMPARISON");
-        System.out.println("=".repeat(70));
-        System.out.println(String.format("%-40s %-15s %-15s", 
+        System.out.println("=".repeat(90));
+        System.out.println(String.format("%-60s %14s %14s", 
             "Algorithm", "Avg Wait Time", "Avg TAT"));
-        System.out.println("=".repeat(70));
+        System.out.println("=".repeat(90));
         
         for (Scheduler scheduler : schedulers) {
-            System.out.println(String.format("%-40s %-15.2f %-15.2f",
+            System.out.println(String.format("%-60s %14.2f %14.2f",
                 scheduler.getAlgorithmName(),
                 scheduler.getAverageWaitingTime(),
                 scheduler.getAverageTurnaroundTime()));
         }
         
-        System.out.println("=".repeat(70));
-        
-        // Find best algorithm
-        Scheduler bestWT = schedulers[0];
-        Scheduler bestTAT = schedulers[0];
-        
-        for (Scheduler scheduler : schedulers) {
-            if (scheduler.getAverageWaitingTime() < bestWT.getAverageWaitingTime()) {
-                bestWT = scheduler;
-            }
-            if (scheduler.getAverageTurnaroundTime() < bestTAT.getAverageTurnaroundTime()) {
-                bestTAT = scheduler;
-            }
-        }
-        
-        System.out.println("\nBEST PERFORMING ALGORITHMS:");
-        System.out.println("  Best Average Waiting Time: " + bestWT.getAlgorithmName() + 
-            String.format(" (%.2f ms)", bestWT.getAverageWaitingTime()));
-        System.out.println("  Best Average Turnaround Time: " + bestTAT.getAlgorithmName() + 
-            String.format(" (%.2f ms)", bestTAT.getAverageTurnaroundTime()));
-        System.out.println("=".repeat(70));
+        System.out.println("=".repeat(90));
     }
 }
