@@ -297,8 +297,8 @@ java -version
 
 ## Authors
 
-[Add your names and student IDs here]
-
+Abdulaziz Alasmari 443100261
+Yaqoub Alnajrani 443100407
 ## Course Information
 
 - **Course**: CSC227
